@@ -1,35 +1,80 @@
-# OpenAI Realtime Console
+# 소방서 3조 2교대 월 근무계획표
 
-This is an example application showing how to use the [OpenAI Realtime API](https://platform.openai.com/docs/guides/realtime) with [WebRTC](https://platform.openai.com/docs/guides/realtime-webrtc).
+## 개요
+이 프로그램은 소방서의 3조 2교대제 근무를 관리하기 위한 월간 근무계획표입니다.
 
-## Installation and usage
+## 주요 기능
 
-Before you begin, you'll need an OpenAI API key - [create one in the dashboard here](https://platform.openai.com/settings/api-keys). Create a `.env` file from the example file and set your API key in there:
+### 1. 부서별 관리
+- **센터**: 펌프차 1호, 펌프차 2호, 물탱크차
+- **구조대**: 구조차 1호, 구조차 2호, 구조공작차
+- **구급대**: 구급차 1호, 구급차 2호, 구급차 3호
 
-```bash
-cp .env.example .env
+### 2. 근무 형태 분류
+- **당번**: 24시간 근무 (빨간색)
+- **비번**: 휴무 (초록색)
+- **일근**: 09:00-18:00 (파란색)
+- **주간**: 08:00-20:00 (주황색)
+- **야간**: 20:00-08:00 (보라색)
+
+### 3. 복무 사항
+- **연가**: 연차휴가 (하늘색)
+- **출장**: 공무출장 (갈색)
+- **외출**: 일시외출 (회색)
+
+### 4. 3조 2교대 패턴
+- 1조: 당번 → 비번 → 비번
+- 2조: 비번 → 당번 → 비번
+- 3조: 비번 → 비번 → 당번
+
+## 사용 방법
+
+### 파일 열기
+1. `fire_station_schedule.html` 파일을 웹 브라우저에서 엽니다.
+2. 자동으로 현재 월의 근무계획표가 표시됩니다.
+
+### 부서 전환
+- 상단의 탭(센터, 구조대, 구급대)을 클릭하여 부서별 근무표를 확인합니다.
+
+### 인원 및 차량 정보 수정
+`script.js` 파일의 `departments` 객체에서 인원과 차량 정보를 수정할 수 있습니다:
+
+```javascript
+center: {
+    name: '센터',
+    teams: [
+        { team: 1, members: [
+            { name: '김철수', vehicle: '펌프차 1호' },
+            { name: '이영희', vehicle: '펌프차 1호' }
+        ]},
+        // ... 추가 팀원
+    ]
+}
 ```
 
-Running this application locally requires [Node.js](https://nodejs.org/) to be installed. Install dependencies for the application with:
+### 특별 근무 추가
+`script.js` 파일의 `specialSchedules` 객체에서 특별 근무를 추가할 수 있습니다:
 
-```bash
-npm install
+```javascript
+const specialSchedules = {
+    '김철수': { 15: 'leave', 16: 'leave', 17: 'leave' }, // 15-17일 연가
+    '박민수': { 8: 'trip', 9: 'trip' }, // 8-9일 출장
+    // ... 추가 특별 근무
+};
 ```
 
-Start the application server with:
+## 파일 구성
+- `fire_station_schedule.html`: 메인 HTML 파일
+- `styles.css`: 스타일시트
+- `script.js`: JavaScript 로직
+- `README.md`: 사용 설명서
 
-```bash
-npm run dev
-```
+## 특징
+- 반응형 디자인으로 모바일에서도 사용 가능
+- 주말은 빨간색 배경으로 표시
+- 월간 근무 통계 자동 계산
+- 인쇄 시 깔끔한 레이아웃
 
-This should start the console application on [http://localhost:3000](http://localhost:3000).
-
-_Note:_ The `server.js` file uses [@fastify/vite](https://fastify-vite.dev/) to build and serve the React frontend contained in the [`/client`](./client) folder. You can find the configuration in the [`vite.config.js`](./vite.config.js) file.
-
-## Previous WebSockets version
-
-The previous version of this application that used WebSockets on the client (not recommended in client-side browsers) [can be found here](https://github.com/openai/openai-realtime-console/tree/websockets).
-
-## License
-
-MIT
+## 주의사항
+- 인원 추가/삭제 시 차량 배정도 함께 수정해야 합니다.
+- 특별 근무는 기본 3조 2교대 패턴보다 우선 적용됩니다.

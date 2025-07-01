@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소방서 3조 2교대 월 근무계획표</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>소방서 월 근무계획표</h1>
+        <div class="header-info">
+            <p>근무체계: 3조 2교대제</p>
+            <p>기간: <span id="currentMonth"></span></p>
+        </div>
+
+        <!-- 범례 -->
+        <div class="legend">
+            <h3>범례</h3>
+            <div class="legend-items">
+                <div class="legend-item"><span class="badge duty">당번</span> 24시간 근무</div>
+                <div class="legend-item"><span class="badge off">비번</span> 휴무</div>
+                <div class="legend-item"><span class="badge day">일근</span> 09:00-18:00</div>
+                <div class="legend-item"><span class="badge morning">주간</span> 08:00-20:00</div>
+                <div class="legend-item"><span class="badge night">야간</span> 20:00-08:00</div>
+                <div class="legend-item"><span class="badge leave">연가</span> 연차휴가</div>
+                <div class="legend-item"><span class="badge trip">출장</span> 공무출장</div>
+                <div class="legend-item"><span class="badge out">외출</span> 일시외출</div>
+            </div>
+        </div>
+
+        <!-- 부서별 탭 -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="showDepartment('center')">센터</button>
+            <button class="tab-button" onclick="showDepartment('rescue')">구조대</button>
+            <button class="tab-button" onclick="showDepartment('emergency')">구급대</button>
+        </div>
+
+        <!-- 센터 -->
+        <div id="center" class="department-section">
+            <h2>센터 근무계획표</h2>
+            <div class="vehicle-info">
+                <h4>출동차량 배정</h4>
+                <ul>
+                    <li>펌프차 1호: 1조 - 김철수, 이영희</li>
+                    <li>펌프차 2호: 2조 - 박민수, 정수진</li>
+                    <li>물탱크차: 3조 - 최강호, 한미라</li>
+                </ul>
+            </div>
+            <div class="table-wrapper">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>성명</th>
+                            <th>조</th>
+                            <th>차량</th>
+                            <th colspan="31" id="centerDays"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="centerSchedule">
+                        <!-- JavaScript로 동적 생성 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 구조대 -->
+        <div id="rescue" class="department-section" style="display:none;">
+            <h2>구조대 근무계획표</h2>
+            <div class="vehicle-info">
+                <h4>출동차량 배정</h4>
+                <ul>
+                    <li>구조차 1호: 1조 - 강동원, 송지효</li>
+                    <li>구조차 2호: 2조 - 유재석, 김태희</li>
+                    <li>구조공작차: 3조 - 이승기, 박보영</li>
+                </ul>
+            </div>
+            <div class="table-wrapper">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>성명</th>
+                            <th>조</th>
+                            <th>차량</th>
+                            <th colspan="31" id="rescueDays"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="rescueSchedule">
+                        <!-- JavaScript로 동적 생성 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 구급대 -->
+        <div id="emergency" class="department-section" style="display:none;">
+            <h2>구급대 근무계획표</h2>
+            <div class="vehicle-info">
+                <h4>출동차량 배정</h4>
+                <ul>
+                    <li>구급차 1호: 1조 - 정우성, 김하늘</li>
+                    <li>구급차 2호: 2조 - 조인성, 전지현</li>
+                    <li>구급차 3호: 3조 - 현빈, 손예진</li>
+                </ul>
+            </div>
+            <div class="table-wrapper">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>성명</th>
+                            <th>조</th>
+                            <th>차량</th>
+                            <th colspan="31" id="emergencyDays"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="emergencySchedule">
+                        <!-- JavaScript로 동적 생성 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 통계 정보 -->
+        <div class="statistics">
+            <h3>월간 근무 통계</h3>
+            <div id="stats"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
