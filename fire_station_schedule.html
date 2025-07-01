@@ -125,6 +125,37 @@
             <h3>월간 근무 통계</h3>
             <div id="stats"></div>
         </div>
+
+        <!-- 수정 모드 토글 버튼 -->
+        <div class="edit-controls">
+            <button id="editModeBtn" class="edit-mode-btn" onclick="toggleEditMode()">
+                <span class="edit-icon">✏️</span> 수정 모드
+            </button>
+            <button id="saveBtn" class="save-btn" style="display:none;" onclick="saveSchedule()">
+                <span class="save-icon">💾</span> 저장
+            </button>
+            <button id="cancelBtn" class="cancel-btn" style="display:none;" onclick="cancelEdit()">
+                <span class="cancel-icon">❌</span> 취소
+            </button>
+        </div>
+    </div>
+
+    <!-- 근무 상태 선택 팝업 -->
+    <div id="shiftModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3>근무 상태 선택</h3>
+            <div class="shift-options">
+                <button class="shift-option duty" onclick="selectShift('duty')">당번</button>
+                <button class="shift-option off" onclick="selectShift('off')">비번</button>
+                <button class="shift-option day" onclick="selectShift('day')">일근</button>
+                <button class="shift-option morning" onclick="selectShift('morning')">주간</button>
+                <button class="shift-option night" onclick="selectShift('night')">야간</button>
+                <button class="shift-option leave" onclick="selectShift('leave')">연가</button>
+                <button class="shift-option trip" onclick="selectShift('trip')">출장</button>
+                <button class="shift-option out" onclick="selectShift('out')">외출</button>
+            </div>
+            <button class="close-modal" onclick="closeModal()">닫기</button>
+        </div>
     </div>
 
     <script src="script.js"></script>

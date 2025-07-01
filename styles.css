@@ -282,6 +282,161 @@ h1 {
     color: #d32f2f;
 }
 
+/* 수정 모드 컨트롤 */
+.edit-controls {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px;
+}
+
+.edit-mode-btn, .save-btn, .cancel-btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0 10px;
+    transition: all 0.3s;
+}
+
+.edit-mode-btn {
+    background-color: #2196f3;
+    color: white;
+}
+
+.edit-mode-btn:hover {
+    background-color: #1976d2;
+}
+
+.edit-mode-btn.active {
+    background-color: #ff9800;
+}
+
+.save-btn {
+    background-color: #4caf50;
+    color: white;
+}
+
+.save-btn:hover {
+    background-color: #45a049;
+}
+
+.cancel-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #da190b;
+}
+
+/* 수정 가능한 셀 스타일 */
+.schedule-table td.editable {
+    cursor: pointer;
+    position: relative;
+}
+
+.schedule-table td.editable:hover {
+    outline: 2px solid #2196f3;
+    outline-offset: -2px;
+}
+
+/* 모달 스타일 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 90%;
+}
+
+.modal-content h3 {
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+.shift-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.shift-option {
+    padding: 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    transition: transform 0.2s;
+}
+
+.shift-option:hover {
+    transform: scale(1.05);
+}
+
+.shift-option.duty {
+    background-color: #ff5722;
+}
+
+.shift-option.off {
+    background-color: #4caf50;
+}
+
+.shift-option.day {
+    background-color: #2196f3;
+}
+
+.shift-option.morning {
+    background-color: #ff9800;
+}
+
+.shift-option.night {
+    background-color: #9c27b0;
+}
+
+.shift-option.leave {
+    background-color: #00bcd4;
+}
+
+.shift-option.trip {
+    background-color: #795548;
+}
+
+.shift-option.out {
+    background-color: #607d8b;
+}
+
+.close-modal {
+    width: 100%;
+    padding: 10px;
+    background-color: #666;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.close-modal:hover {
+    background-color: #555;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .legend-items {
@@ -305,5 +460,9 @@ h1 {
     .schedule-table td {
         padding: 4px;
         min-width: 25px;
+    }
+    
+    .shift-options {
+        grid-template-columns: repeat(2, 1fr);
     }
 }

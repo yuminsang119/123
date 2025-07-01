@@ -246,3 +246,192 @@ function generateStatistics() {
     
     document.getElementById('stats').innerHTML = statsHTML;
 }
+
+// 수정 모드 관련 변수
+let isEditMode = false;
+let currentEditCell = null;
+let originalSchedule = {};
+let modifiedSchedule = {};
+
+// 수정 모드 토글
+function toggleEditMode() {
+    isEditMode = !isEditMode;
+    const editBtn = document.getElementById('editModeBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    
+    if (isEditMode) {
+        editBtn.classList.add('active');
+        editBtn.innerHTML = '<span class="edit-icon">✏️</span> 수정 중...';
+        saveBtn.style.display = 'inline-block';
+        cancelBtn.style.display = 'inline-block';
+        
+        // 원본 데이터 백업
+        backupOriginalSchedule();
+        
+        // 모든 근무 셀을 수정 가능하게 만들기
+        enableEditableCells();
+    } else {
+        editBtn.classList.remove('active');
+        editBtn.innerHTML = '<span class="edit-icon">✏️</span> 수정 모드';
+        saveBtn.style.display = 'none';
+        cancelBtn.style.display = 'none';
+        
+        // 수정 가능 상태 해제
+        disableEditableCells();
+    }
+}
+
+// 원본 스케줄 백업
+function backupOriginalSchedule() {
+    originalSchedule = JSON.parse(JSON.stringify(specialSchedules));
+    modifiedSchedule = JSON.parse(JSON.stringify(specialSchedules));
+}
+
+// 셀 수정 가능하게 만들기
+function enableEditableCells() {
+    const cells = document.querySelectorAll('.schedule-table td');
+    cells.forEach((cell, index) => {
+        // 이름, 조, 차량 열은 제외
+        if (index % (daysInMonth + 3) > 2) {
+            cell.classList.add('editable');
+            cell.onclick = function() {
+                if (isEditMode) {
+                    openShiftModal(this);
+                }
+            };
+        }
+    });
+}
+
+// 셀 수정 불가능하게 만들기
+function disableEditableCells() {
+    const cells = document.querySelectorAll('.schedule-table td');
+    cells.forEach(cell => {
+        cell.classList.remove('editable');
+        cell.onclick = null;
+    });
+}
+
+// 근무 선택 모달 열기
+function openShiftModal(cell) {
+    currentEditCell = cell;
+    document.getElementById('shiftModal').style.display = 'flex';
+}
+
+// 모달 닫기
+function closeModal() {
+    document.getElementById('shiftModal').style.display = 'none';
+    currentEditCell = null;
+}
+
+// 근무 상태 선택
+function selectShift(shiftType) {
+    if (currentEditCell) {
+        // 셀 업데이트
+        currentEditCell.className = shiftType;
+        currentEditCell.textContent = getShiftText(shiftType);
+        
+        // 데이터 업데이트
+        updateScheduleData(currentEditCell, shiftType);
+        
+        closeModal();
+    }
+}
+
+// 스케줄 데이터 업데이트
+function updateScheduleData(cell, shiftType) {
+    const row = cell.parentElement;
+    const memberName = row.cells[0].textContent;
+    const cellIndex = Array.from(row.cells).indexOf(cell);
+    const day = cellIndex - 2; // 이름, 조, 차량 열을 제외한 날짜
+    
+    if (!modifiedSchedule[memberName]) {
+        modifiedSchedule[memberName] = {};
+    }
+    
+    // 기본 패턴과 같으면 특별 스케줄에서 제거
+    const teamNumber = parseInt(row.cells[1].textContent);
+    const cycleDay = ((day - 1) % 3);
+    const defaultShift = shiftPattern[teamNumber][cycleDay];
+    
+    if (shiftType === defaultShift) {
+        delete modifiedSchedule[memberName][day];
+        if (Object.keys(modifiedSchedule[memberName]).length === 0) {
+            delete modifiedSchedule[memberName];
+        }
+    } else {
+        modifiedSchedule[memberName][day] = shiftType;
+    }
+}
+
+// 스케줄 저장
+function saveSchedule() {
+    if (confirm('수정한 근무표를 저장하시겠습니까?')) {
+        // 실제 스케줄 업데이트
+        Object.keys(specialSchedules).forEach(key => delete specialSchedules[key]);
+        Object.assign(specialSchedules, modifiedSchedule);
+        
+        // 로컬 스토리지에 저장
+        localStorage.setItem('fireStationSchedule', JSON.stringify(specialSchedules));
+        
+        alert('근무표가 저장되었습니다.');
+        
+        // 수정 모드 종료
+        toggleEditMode();
+        
+        // 통계 업데이트
+        generateStatistics();
+    }
+}
+
+// 수정 취소
+function cancelEdit() {
+    if (confirm('수정한 내용을 취소하시겠습니까?')) {
+        // 원본 데이터로 복원
+        Object.keys(specialSchedules).forEach(key => delete specialSchedules[key]);
+        Object.assign(specialSchedules, originalSchedule);
+        
+        // 화면 다시 그리기
+        generateSchedule('center');
+        generateSchedule('rescue');
+        generateSchedule('emergency');
+        
+        // 수정 모드 종료
+        toggleEditMode();
+    }
+}
+
+// 페이지 로드 시 저장된 데이터 불러오기
+function loadSavedSchedule() {
+    const saved = localStorage.getItem('fireStationSchedule');
+    if (saved) {
+        const savedSchedule = JSON.parse(saved);
+        Object.keys(specialSchedules).forEach(key => delete specialSchedules[key]);
+        Object.assign(specialSchedules, savedSchedule);
+    }
+}
+
+// 초기화 함수 수정
+const originalInit = document.addEventListener;
+document.addEventListener('DOMContentLoaded', function() {
+    // 저장된 스케줄 불러오기
+    loadSavedSchedule();
+    
+    // 현재 월 표시
+    document.getElementById('currentMonth').textContent = 
+        `${currentYear}년 ${currentMonth + 1}월`;
+    
+    // 각 부서별 날짜 헤더 생성
+    createDateHeaders('center');
+    createDateHeaders('rescue');
+    createDateHeaders('emergency');
+    
+    // 각 부서별 근무표 생성
+    generateSchedule('center');
+    generateSchedule('rescue');
+    generateSchedule('emergency');
+    
+    // 통계 생성
+    generateStatistics();
+});
