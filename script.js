@@ -76,25 +76,7 @@ const currentYear = now.getFullYear();
 const currentMonth = now.getMonth();
 const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-// 페이지 로드 시 초기화
-document.addEventListener('DOMContentLoaded', function() {
-    // 현재 월 표시
-    document.getElementById('currentMonth').textContent = 
-        `${currentYear}년 ${currentMonth + 1}월`;
-    
-    // 각 부서별 날짜 헤더 생성
-    createDateHeaders('center');
-    createDateHeaders('rescue');
-    createDateHeaders('emergency');
-    
-    // 각 부서별 근무표 생성
-    generateSchedule('center');
-    generateSchedule('rescue');
-    generateSchedule('emergency');
-    
-    // 통계 생성
-    generateStatistics();
-});
+// 삭제된 중복 코드
 
 // 날짜 헤더 생성
 function createDateHeaders(departmentId) {
@@ -412,8 +394,7 @@ function loadSavedSchedule() {
     }
 }
 
-// 초기화 함수 수정
-const originalInit = document.addEventListener;
+// 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', function() {
     // 저장된 스케줄 불러오기
     loadSavedSchedule();
