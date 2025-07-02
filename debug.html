@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>디버그 테스트</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test { padding: 10px; margin: 10px 0; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>소방서 근무계획표 디버그 테스트</h1>
+    
+    <div id="test1" class="test">
+        <h3>1. 기본 HTML 로딩</h3>
+        <p>✅ HTML 파일이 정상적으로 로드되었습니다.</p>
+    </div>
+    
+    <div id="test2" class="test">
+        <h3>2. JavaScript 로딩 테스트</h3>
+        <p id="js-status">❌ JavaScript 로딩 중...</p>
+    </div>
+    
+    <div id="test3" class="test">
+        <h3>3. CSS 로딩 테스트</h3>
+        <p id="css-status">❌ CSS 로딩 중...</p>
+    </div>
+    
+    <div id="test4" class="test">
+        <h3>4. 날짜 함수 테스트</h3>
+        <p id="date-status">현재 시간: <span id="current-time"></span></p>
+    </div>
+    
+    <div id="test5" class="test">
+        <h3>5. 메인 페이지 링크</h3>
+        <p><a href="fire_station_schedule.html" target="_blank">🔗 소방서 근무계획표 열기</a></p>
+    </div>
+
+    <script>
+        // JavaScript 로딩 확인
+        document.getElementById('js-status').innerHTML = '✅ JavaScript가 정상적으로 로드되었습니다.';
+        document.getElementById('test2').className = 'test success';
+        
+        // CSS 로딩 확인 (간접적)
+        const testElement = document.createElement('div');
+        testElement.style.display = 'none';
+        document.body.appendChild(testElement);
+        const computedStyle = window.getComputedStyle(testElement);
+        if (computedStyle.display === 'none') {
+            document.getElementById('css-status').innerHTML = '✅ CSS가 정상적으로 로드되었습니다.';
+            document.getElementById('test3').className = 'test success';
+        }
+        
+        // 날짜 함수 테스트
+        try {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleString('ko-KR');
+            document.getElementById('test4').className = 'test success';
+        } catch (e) {
+            document.getElementById('current-time').textContent = '오류: ' + e.message;
+            document.getElementById('test4').className = 'test error';
+        }
+        
+        // 페이지 로드 완료 메시지
+        window.addEventListener('load', function() {
+            console.log('페이지 로드 완료');
+            
+            // 메인 스크립트 파일 테스트
+            const script = document.createElement('script');
+            script.src = 'script.js';
+            script.onload = function() {
+                console.log('script.js 로드 성공');
+            };
+            script.onerror = function() {
+                console.error('script.js 로드 실패');
+            };
+            document.head.appendChild(script);
+        });
+    </script>
+</body>
+</html>
