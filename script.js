@@ -80,18 +80,18 @@ const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
 // 날짜 헤더 생성
 function createDateHeaders(departmentId) {
-    const daysElement = document.getElementById(departmentId + 'Days');
-    let daysHTML = '';
-    
+    const row = document.getElementById(departmentId + 'Days');
+    let html = '<th>성명</th><th>조</th><th>차량</th>';
+
     for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(currentYear, currentMonth, day);
         const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
         const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-        
-        daysHTML += `<th style="${isWeekend ? 'background-color: #ffebee;' : ''}">${day}<br><small>${dayOfWeek}</small></th>`;
+
+        html += `<th style="${isWeekend ? 'background-color: #ffebee;' : ''}">${day}<br><small>${dayOfWeek}</small></th>`;
     }
-    
-    daysElement.innerHTML = daysHTML;
+
+    row.innerHTML = html;
 }
 
 // 근무표 생성
@@ -157,7 +157,7 @@ function getShiftText(shiftType) {
 }
 
 // 부서 탭 전환
-function showDepartment(departmentId) {
+function showDepartment(departmentId, evt) {
     // 모든 탭 버튼 비활성화
     document.querySelectorAll('.tab-button').forEach(btn => {
         btn.classList.remove('active');
@@ -169,7 +169,9 @@ function showDepartment(departmentId) {
     });
     
     // 선택된 탭 활성화
-    event.target.classList.add('active');
+    if (evt) {
+        evt.target.classList.add('active');
+    }
     
     // 선택된 부서 섹션 표시
     document.getElementById(departmentId).style.display = 'block';

@@ -31,9 +31,9 @@
 
         <!-- 부서별 탭 -->
         <div class="tabs">
-            <button class="tab-button active" onclick="showDepartment('center')">센터</button>
-            <button class="tab-button" onclick="showDepartment('rescue')">구조대</button>
-            <button class="tab-button" onclick="showDepartment('emergency')">구급대</button>
+            <button class="tab-button active" onclick="showDepartment('center', event)">센터</button>
+            <button class="tab-button" onclick="showDepartment('rescue', event)">구조대</button>
+            <button class="tab-button" onclick="showDepartment('emergency', event)">구급대</button>
         </div>
 
         <!-- 센터 -->
@@ -50,12 +50,7 @@
             <div class="table-wrapper">
                 <table class="schedule-table">
                     <thead>
-                        <tr>
-                            <th>성명</th>
-                            <th>조</th>
-                            <th>차량</th>
-                            <th colspan="31" id="centerDays"></th>
-                        </tr>
+                        <tr id="centerDays"></tr>
                     </thead>
                     <tbody id="centerSchedule">
                         <!-- JavaScript로 동적 생성 -->
@@ -78,12 +73,7 @@
             <div class="table-wrapper">
                 <table class="schedule-table">
                     <thead>
-                        <tr>
-                            <th>성명</th>
-                            <th>조</th>
-                            <th>차량</th>
-                            <th colspan="31" id="rescueDays"></th>
-                        </tr>
+                        <tr id="rescueDays"></tr>
                     </thead>
                     <tbody id="rescueSchedule">
                         <!-- JavaScript로 동적 생성 -->
@@ -106,12 +96,7 @@
             <div class="table-wrapper">
                 <table class="schedule-table">
                     <thead>
-                        <tr>
-                            <th>성명</th>
-                            <th>조</th>
-                            <th>차량</th>
-                            <th colspan="31" id="emergencyDays"></th>
-                        </tr>
+                        <tr id="emergencyDays"></tr>
                     </thead>
                     <tbody id="emergencySchedule">
                         <!-- JavaScript로 동적 생성 -->
