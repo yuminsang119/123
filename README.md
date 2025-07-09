@@ -94,3 +94,10 @@ const specialSchedules = {
 ## 주의사항
 - 인원 추가/삭제 시 차량 배정도 함께 수정해야 합니다.
 - 특별 근무는 기본 3조 2교대 패턴보다 우선 적용됩니다.
+
+## GitHub Pages 배포
+
+`docs/` 폴더에는 배포에 필요한 정적 파일이 포함되어 있습니다. `main` 브랜치에 변경 사항이 푸시되면 GitHub Actions가 자동으로 Pages를 업데이트합니다.
+
+1. 저장소 **Settings > Pages**에서 소스를 `GitHub Actions`로 지정합니다.
+2. 배포 후 `https://<사용자이름>.github.io/<저장소명>/` 주소에서 웹페이지를 확인할 수 있습니다.
