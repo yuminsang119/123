@@ -7,18 +7,18 @@ https://tailwindcss.com/docs/preflight
 @tailwind utilities;
 
 :root {
-  --color-base: #efefef;
-  --color-highlight: #ff80ff;
+  --color-base: #f8fafc;
 }
 
 html,
 body {
-  height: 100%;
+  min-height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
-  font-family: "Consolas", "Andale Mono", monospace;
-  font-size: 0.9rem;
+  overflow-x: hidden;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+    Helvetica, Arial, \"Apple Color Emoji\", \"Segoe UI Emoji\";
+  font-size: 16px;
   background-color: var(--color-base);
 }

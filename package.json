@@ -10,10 +10,13 @@
     "lint": "eslint . --ext .js,.jsx --fix"
   },
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
     "@fastify/env": "^4.4.0",
+    "@fastify/jwt": "^10.0.0",
     "@fastify/one-line-logger": "^1.2.0",
     "@fastify/react": "^0.6.0",
     "@fastify/vite": "^6.0.5",
+    "better-sqlite3": "^12.5.0",
     "fastify": "^4.24.3",
     "history": "^5.3.0",
     "minipass": "^7.0.4",
