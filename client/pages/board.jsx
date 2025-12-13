@@ -14,7 +14,7 @@ async function api(path, options = {}) {
   if (!res.ok) {
     const message = data?.message || `요청 실패 (${res.status})`;
     const err = new Error(message);
-    err.status = res.status;
+    // 상태코드가 필요하면 이후 확장 가능
     throw err;
   }
   return data;
@@ -47,7 +47,7 @@ export default function BoardPage() {
       try {
         const data = await api("/api/me");
         if (!cancelled) setMe(data?.user || null);
-      } catch (err) {
+      } catch {
         if (!cancelled) setMe(null);
       } finally {
         if (!cancelled) setMeLoading(false);
