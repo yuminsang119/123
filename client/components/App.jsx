@@ -1,161 +1,169 @@
-import { useEffect, useRef, useState } from "react";
-import logo from "/assets/openai-logomark.svg";
-import EventLog from "./EventLog";
-import SessionControls from "./SessionControls";
-import ToolPanel from "./ToolPanel";
+import { useCallback, useEffect, useState } from "react";
+import { AlertTriangle, MessageSquare, Phone, RefreshCw } from "react-feather";
+import useGeolocation, { DEFAULT_LOCATION } from "../hooks/useGeolocation";
+import DisasterMap from "./DisasterMap";
+import DisasterList from "./DisasterList";
+import EmergencyChat from "./EmergencyChat";
+import VoiceCall from "./VoiceCall";
 
 export default function App() {
-  const [isSessionActive, setIsSessionActive] = useState(false);
-  const [events, setEvents] = useState([]);
-  const [dataChannel, setDataChannel] = useState(null);
-  const peerConnection = useRef(null);
-  const audioElement = useRef(null);
+  const { location, status } = useGeolocation();
+  const [alerts, setAlerts] = useState([]);
+  const [loadingAlerts, setLoadingAlerts] = useState(true);
+  const [selectedId, setSelectedId] = useState(null);
+  const [activeDisaster, setActiveDisaster] = useState(null);
+  const [tab, setTab] = useState("chat"); // chat | voice
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [updatedAt, setUpdatedAt] = useState(null);
 
-  async function startSession() {
-    // Get an ephemeral key from the Fastify server
-    const tokenResponse = await fetch("/token");
-    const data = await tokenResponse.json();
-    const EPHEMERAL_KEY = data.client_secret.value;
+  const center = location || DEFAULT_LOCATION;
 
-    // Create a peer connection
-    const pc = new RTCPeerConnection();
-
-    // Set up to play remote audio from the model
-    audioElement.current = document.createElement("audio");
-    audioElement.current.autoplay = true;
-    pc.ontrack = (e) => (audioElement.current.srcObject = e.streams[0]);
-
-    // Add local audio track for microphone input in the browser
-    const ms = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-    });
-    pc.addTrack(ms.getTracks()[0]);
-
-    // Set up data channel for sending and receiving events
-    const dc = pc.createDataChannel("oai-events");
-    setDataChannel(dc);
-
-    // Start the session using the Session Description Protocol (SDP)
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-
-    const baseUrl = "https://api.openai.com/v1/realtime";
-    const model = "gpt-4o-realtime-preview-2024-12-17";
-    const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
-      method: "POST",
-      body: offer.sdp,
-      headers: {
-        Authorization: `Bearer ${EPHEMERAL_KEY}`,
-        "Content-Type": "application/sdp",
-      },
-    });
-
-    const answer = {
-      type: "answer",
-      sdp: await sdpResponse.text(),
-    };
-    await pc.setRemoteDescription(answer);
-
-    peerConnection.current = pc;
-  }
-
-  // Stop current session, clean up peer connection and data channel
-  function stopSession() {
-    if (dataChannel) {
-      dataChannel.close();
-    }
-    if (peerConnection.current) {
-      peerConnection.current.close();
-    }
-
-    setIsSessionActive(false);
-    setDataChannel(null);
-    peerConnection.current = null;
-  }
-
-  // Send a message to the model
-  function sendClientEvent(message) {
-    if (dataChannel) {
-      message.event_id = message.event_id || crypto.randomUUID();
-      dataChannel.send(JSON.stringify(message));
-      setEvents((prev) => [message, ...prev]);
-    } else {
-      console.error(
-        "Failed to send message - no data channel available",
-        message,
-      );
-    }
-  }
-
-  // Send a text message to the model
-  function sendTextMessage(message) {
-    const event = {
-      type: "conversation.item.create",
-      item: {
-        type: "message",
-        role: "user",
-        content: [
-          {
-            type: "input_text",
-            text: message,
-          },
-        ],
-      },
-    };
-
-    sendClientEvent(event);
-    sendClientEvent({ type: "response.create" });
-  }
-
-  // Attach event listeners to the data channel when a new one is created
   useEffect(() => {
-    if (dataChannel) {
-      // Append new server events to the list
-      dataChannel.addEventListener("message", (e) => {
-        setEvents((prev) => [JSON.parse(e.data), ...prev]);
-      });
+    fetch("/api/config")
+      .then((r) => r.json())
+      .then((c) => setVoiceEnabled(Boolean(c.voiceEnabled)))
+      .catch(() => setVoiceEnabled(false));
+  }, []);
 
-      // Set session active when the data channel is opened
-      dataChannel.addEventListener("open", () => {
-        setIsSessionActive(true);
-        setEvents([]);
-      });
-    }
-  }, [dataChannel]);
+  const loadAlerts = useCallback(() => {
+    if (!location) return;
+    setLoadingAlerts(true);
+    fetch(`/api/disasters?lat=${location.lat}&lon=${location.lon}&radius=30`)
+      .then((r) => r.json())
+      .then((data) => {
+        setAlerts(data.alerts || []);
+        setUpdatedAt(data.updatedAt);
+      })
+      .catch(() => setAlerts([]))
+      .finally(() => setLoadingAlerts(false));
+  }, [location]);
+
+  useEffect(() => {
+    loadAlerts();
+  }, [loadAlerts]);
+
+  const handleReport = useCallback((alert) => {
+    setActiveDisaster(alert);
+    setSelectedId(alert.id);
+    setTab("chat");
+  }, []);
+
+  const emergencyCount = alerts.filter((a) => a.severity === "emergency").length;
 
   return (
-    <>
-      <nav className="absolute top-0 left-0 right-0 h-16 flex items-center">
-        <div className="flex items-center gap-4 w-full m-4 pb-2 border-0 border-b border-solid border-gray-200">
-          <img style={{ width: "24px" }} src={logo} />
-          <h1>realtime console</h1>
+    <div className="h-full w-full flex flex-col bg-gray-100 text-gray-900">
+      {/* Header */}
+      <header className="flex items-center gap-3 px-4 h-14 bg-red-600 text-white shadow-md flex-shrink-0">
+        <AlertTriangle size={22} />
+        <div className="flex flex-col leading-tight">
+          <span className="font-bold text-base">119 안심콜</span>
+          <span className="text-[11px] text-red-100">주변 재난알림 · 양방향 신고</span>
         </div>
-      </nav>
-      <main className="absolute top-16 left-0 right-0 bottom-0">
-        <section className="absolute top-0 left-0 right-[380px] bottom-0 flex">
-          <section className="absolute top-0 left-0 right-0 bottom-32 px-4 overflow-y-auto">
-            <EventLog events={events} />
-          </section>
-          <section className="absolute h-32 left-0 right-0 bottom-0 p-4">
-            <SessionControls
-              startSession={startSession}
-              stopSession={stopSession}
-              sendClientEvent={sendClientEvent}
-              sendTextMessage={sendTextMessage}
-              events={events}
-              isSessionActive={isSessionActive}
+        <div className="ml-auto flex items-center gap-3">
+          {emergencyCount > 0 && (
+            <span className="text-xs bg-white text-red-700 font-bold px-2 py-1 rounded-full">
+              심각 {emergencyCount}건
+            </span>
+          )}
+          <a
+            href="tel:119"
+            className="flex items-center gap-1.5 bg-white text-red-700 font-bold text-sm px-3 py-1.5 rounded-full hover:bg-red-50"
+          >
+            <Phone size={15} /> 119
+          </a>
+        </div>
+      </header>
+
+      {/* Body */}
+      <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-4 p-4 overflow-y-auto lg:overflow-hidden">
+        {/* Left: map + list */}
+        <section className="flex-1 min-w-0 flex flex-col gap-4 lg:overflow-hidden">
+          <div className="h-64 lg:h-[45%] flex-shrink-0 relative rounded-xl shadow-sm bg-white p-1">
+            <DisasterMap
+              center={center}
+              alerts={alerts}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
             />
-          </section>
+          </div>
+          <div className="flex-1 lg:overflow-y-auto bg-white rounded-xl shadow-sm p-4">
+            <div className="flex items-center justify-end mb-2">
+              <button
+                type="button"
+                onClick={loadAlerts}
+                className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800"
+              >
+                <RefreshCw size={13} className={loadingAlerts ? "animate-spin" : ""} />
+                새로고침
+              </button>
+            </div>
+            <DisasterList
+              alerts={alerts}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              onReport={handleReport}
+              status={status}
+            />
+          </div>
         </section>
-        <section className="absolute top-0 w-[380px] right-0 bottom-0 p-4 pt-0 overflow-y-auto">
-          <ToolPanel
-            sendClientEvent={sendClientEvent}
-            sendTextMessage={sendTextMessage}
-            events={events}
-            isSessionActive={isSessionActive}
-          />
+
+        {/* Right: 119 communication */}
+        <section className="w-full lg:w-[400px] flex-shrink-0 flex flex-col bg-white rounded-xl shadow-sm overflow-hidden min-h-[420px] lg:min-h-0">
+          <div className="flex border-b border-gray-200 flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => setTab("chat")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold ${
+                tab === "chat"
+                  ? "text-red-600 border-b-2 border-red-600"
+                  : "text-gray-500"
+              }`}
+            >
+              <MessageSquare size={16} /> 문자 신고
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("voice")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold ${
+                tab === "voice"
+                  ? "text-red-600 border-b-2 border-red-600"
+                  : "text-gray-500"
+              }`}
+            >
+              <Phone size={16} /> 음성 통화
+            </button>
+          </div>
+          <div className="flex-1 min-h-0">
+            {tab === "chat" ? (
+              <EmergencyChat
+                location={location}
+                activeDisaster={activeDisaster}
+                onClearDisaster={() => setActiveDisaster(null)}
+              />
+            ) : voiceEnabled ? (
+              <VoiceCall location={location} />
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 gap-3 bg-gray-50">
+                <Phone size={36} className="text-gray-300" />
+                <p className="text-sm text-gray-500">
+                  음성 통화는 서버에 <code>OPENAI_API_KEY</code>가 설정된 경우
+                  사용할 수 있습니다.
+                </p>
+                <p className="text-xs text-gray-400">
+                  지금은 <b>문자 신고</b>로 상황실과 연결하거나, 아래 버튼으로
+                  실제 119에 전화하세요.
+                </p>
+                <a
+                  href="tel:119"
+                  className="mt-1 flex items-center gap-2 bg-red-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-red-700"
+                >
+                  <Phone size={16} /> 119 전화 걸기
+                </a>
+              </div>
+            )}
+          </div>
         </section>
-      </main>
-    </>
+      </div>
+    </div>
   );
 }
