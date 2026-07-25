@@ -9,14 +9,17 @@ function timeAgo(iso) {
   return `${hours}시간 전`;
 }
 
-function AlertCard({ alert, selected, onSelect, onReport }) {
+function AlertCard({ alert, selected, onSelect, onReport, index }) {
   const color = SEVERITY_COLORS[alert.severity] || "#6b7280";
   return (
     <button
       type="button"
       onClick={() => onSelect(alert.id)}
       className={`alert-item ${selected ? "selected" : ""}`}
-      style={{ "--alert-color": color }}
+      style={{
+        "--alert-color": color,
+        "--stagger-delay": `${Math.min(index, 7) * 55}ms`,
+      }}
     >
       <span className="severity-rail" />
       <div className="alert-layout">
@@ -90,10 +93,11 @@ export default function DisasterList({
         </div>
       ) : (
         <div className="alert-stack">
-          {alerts.map((alert) => (
+          {alerts.map((alert, index) => (
             <AlertCard
               key={alert.id}
               alert={alert}
+              index={index}
               selected={alert.id === selectedId}
               onSelect={onSelect}
               onReport={onReport}

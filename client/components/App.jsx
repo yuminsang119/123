@@ -28,6 +28,7 @@ export default function App() {
   const [mobileView, setMobileView] = useState("home"); // home | map | report
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [updatedAt, setUpdatedAt] = useState(null);
+  const [spotlightIndex, setSpotlightIndex] = useState(0);
 
   const center = location || DEFAULT_LOCATION;
 
@@ -55,6 +56,14 @@ export default function App() {
     loadAlerts();
   }, [loadAlerts]);
 
+  useEffect(() => {
+    if (alerts.length < 2) return undefined;
+    const timer = window.setInterval(() => {
+      setSpotlightIndex((current) => (current + 1) % Math.min(alerts.length, 5));
+    }, 3800);
+    return () => window.clearInterval(timer);
+  }, [alerts.length]);
+
   const handleReport = useCallback((alert) => {
     setActiveDisaster(alert);
     setSelectedId(alert.id);
@@ -79,6 +88,7 @@ export default function App() {
         hour12: false,
       }).format(new Date(updatedAt))
     : "확인 중";
+  const spotlightAlert = alerts[spotlightIndex % Math.max(alerts.length, 1)];
 
   return (
     <div className="app-frame">
@@ -141,6 +151,7 @@ export default function App() {
         >
           <div className="safety-hero">
             <div className="hero-glow" />
+            <div className="hero-grid" />
             <div className="hero-top">
               <span className="hero-kicker">
                 <Activity size={14} /> 실시간 안전 브리핑
@@ -150,11 +161,13 @@ export default function App() {
             <div className="hero-content">
               <div>
                 <p className="hero-label">주변에 확인이 필요한 알림</p>
-                <div className="hero-number">
+                <div className="hero-number" key={`${loadingAlerts}-${warningCount}`}>
                   {loadingAlerts ? "–" : warningCount}<small>건</small>
                 </div>
               </div>
               <div className="hero-orbit">
+                <i className="radar-wave wave-one" />
+                <i className="radar-wave wave-two" />
                 <Bell size={29} />
                 {emergencyCount > 0 && <b>{emergencyCount}</b>}
               </div>
@@ -162,9 +175,20 @@ export default function App() {
             <button
               type="button"
               className="hero-map-link"
-              onClick={() => setMobileView("map")}
+              onClick={() => {
+                if (spotlightAlert) setSelectedId(spotlightAlert.id);
+                setMobileView("map");
+              }}
             >
-              지도에서 위치 확인 <ChevronRight size={16} />
+              <span className="hero-ticker">
+                <i />
+                <span key={spotlightAlert?.id || "loading"}>
+                  {spotlightAlert
+                    ? `${spotlightAlert.category} · ${spotlightAlert.distanceKm}km`
+                    : "실시간 안전정보 확인 중"}
+                </span>
+              </span>
+              <ChevronRight size={16} />
             </button>
           </div>
 

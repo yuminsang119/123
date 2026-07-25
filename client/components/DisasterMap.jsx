@@ -94,7 +94,8 @@ export default function DisasterMap({ center, alerts, selectedId, onSelect }) {
       const size = isSelected ? 40 : 32;
       const icon = L.divIcon({
         className: "",
-        html: `<div style="width:${size}px;height:${size}px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${color};border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
+        html: `<div class="disaster-pin ${isSelected ? "is-selected" : ""}" style="--pin-color:${color};width:${size}px;height:${size}px;">
+          <i></i>
           <span style="transform:rotate(45deg);font-size:${isSelected ? 18 : 15}px;">${alert.icon}</span>
         </div>`,
         iconSize: [size, size],
