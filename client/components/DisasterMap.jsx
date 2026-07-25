@@ -36,7 +36,20 @@ export default function DisasterMap({ center, alerts, selectedId, onSelect }) {
 
     mapRef.current = map;
 
+    // Mobile browsers often lay out the container after mount; force Leaflet
+    // to recalculate tile size so the map is not blank/half-rendered.
+    const invalidate = () => map.invalidateSize();
+    requestAnimationFrame(invalidate);
+    const ro =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(invalidate)
+        : null;
+    if (ro) ro.observe(containerRef.current);
+    window.addEventListener("orientationchange", invalidate);
+
     return () => {
+      window.removeEventListener("orientationchange", invalidate);
+      if (ro) ro.disconnect();
       map.remove();
       mapRef.current = null;
       markersRef.current = {};

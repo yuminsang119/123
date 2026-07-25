@@ -53,21 +53,23 @@ export default function App() {
   return (
     <div className="h-full w-full flex flex-col bg-gray-100 text-gray-900">
       {/* Header */}
-      <header className="flex items-center gap-3 px-4 h-14 bg-red-600 text-white shadow-md flex-shrink-0">
-        <AlertTriangle size={22} />
-        <div className="flex flex-col leading-tight">
-          <span className="font-bold text-base">119 안심콜</span>
-          <span className="text-[11px] text-red-100">주변 재난알림 · 양방향 신고</span>
+      <header className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 h-14 bg-red-600 text-white shadow-md flex-shrink-0 safe-top">
+        <AlertTriangle size={22} className="flex-shrink-0" />
+        <div className="flex flex-col leading-tight min-w-0">
+          <span className="font-bold text-base truncate">119 안심콜</span>
+          <span className="text-[11px] text-red-100 hidden xs:inline sm:inline">
+            주변 재난알림 · 양방향 신고
+          </span>
         </div>
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-2 sm:gap-3 flex-shrink-0">
           {emergencyCount > 0 && (
-            <span className="text-xs bg-white text-red-700 font-bold px-2 py-1 rounded-full">
-              심각 {emergencyCount}건
+            <span className="text-xs bg-white text-red-700 font-bold px-2 py-1 rounded-full whitespace-nowrap">
+              심각 {emergencyCount}
             </span>
           )}
           <a
             href="tel:119"
-            className="flex items-center gap-1.5 bg-white text-red-700 font-bold text-sm px-3 py-1.5 rounded-full hover:bg-red-50"
+            className="flex items-center gap-1.5 bg-white text-red-700 font-bold text-sm px-3 py-2 rounded-full hover:bg-red-50 active:scale-95"
           >
             <Phone size={15} /> 119
           </a>
@@ -75,10 +77,10 @@ export default function App() {
       </header>
 
       {/* Body */}
-      <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-4 p-4 overflow-y-auto lg:overflow-hidden">
+      <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-3 sm:gap-4 p-3 sm:p-4 overflow-y-auto lg:overflow-hidden">
         {/* Left: map + list */}
-        <section className="flex-1 min-w-0 flex flex-col gap-4 lg:overflow-hidden">
-          <div className="h-64 lg:h-[45%] flex-shrink-0 relative rounded-xl shadow-sm bg-white p-1">
+        <section className="flex-1 min-w-0 flex flex-col gap-3 sm:gap-4 lg:overflow-hidden">
+          <div className="h-56 sm:h-64 lg:h-[45%] flex-shrink-0 relative rounded-xl shadow-sm bg-white p-1">
             <DisasterMap
               center={center}
               alerts={alerts}

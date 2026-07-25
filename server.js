@@ -99,4 +99,8 @@ server.get("/token", async (request, reply) => {
   });
 });
 
-await server.listen({ port: process.env.PORT || 3000 });
+// Bind on all interfaces so phones on the same network (or a tunnel) can reach us.
+await server.listen({
+  port: Number(process.env.PORT) || 3000,
+  host: "0.0.0.0",
+});
