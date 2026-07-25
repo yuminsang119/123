@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Send, Phone } from "react-feather";
+import { CheckCircle, MapPin, Send } from "react-feather";
 
 const QUICK_REPLIES = [
   "불이 났어요",
@@ -24,25 +24,19 @@ function Message({ message }) {
   const isUser = message.role === "user";
   const badge = !isUser && message.meta ? urgencyStyle(message.meta.urgency) : null;
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
-      <div className={`max-w-[85%] flex flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}>
+    <div className={`message-row ${isUser ? "user" : "dispatcher"}`}>
+      <div className="message-group">
         {!isUser && (
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <span className="font-semibold text-red-600">119 상황실</span>
+          <div className="message-sender">
+            <span>119 상황실</span>
             {badge && (
-              <span className={`text-white text-[10px] px-1.5 py-0.5 rounded-full ${badge.className}`}>
+              <span className={`urgency-badge ${badge.className}`}>
                 {badge.label}
               </span>
             )}
           </div>
         )}
-        <div
-          className={`px-3.5 py-2.5 rounded-2xl text-sm whitespace-pre-wrap break-words ${
-            isUser
-              ? "bg-blue-600 text-white rounded-br-sm"
-              : "bg-white border border-gray-200 text-gray-800 rounded-bl-sm"
-          }`}
-        >
+        <div className="message-bubble">
           {message.content}
         </div>
       </div>
@@ -113,54 +107,54 @@ export default function EmergencyChat({ location, activeDisaster, onClearDisaste
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="emergency-chat">
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-gray-50"
+        className="chat-stream"
         style={{ minHeight: "200px" }}
       >
         {messages.length === 0 ? (
-          <div className="m-auto text-center text-gray-400 px-6">
-            <div className="text-3xl mb-2">🚨</div>
-            <p className="text-sm">
-              119 상황실과 문자로 연결되었습니다.
-              <br />
-              상황을 입력하시면 접수요원이 안내해 드립니다.
-            </p>
+          <div className="chat-welcome">
+            <div className="welcome-check">
+              <CheckCircle size={23} />
+            </div>
+            <h3>상황실 연결 준비 완료</h3>
+            <p>현재 상황을 짧게 알려주세요.<br />접수요원이 바로 안내해 드립니다.</p>
             {location && (
-              <p className="text-xs mt-2 text-gray-400">
-                신고 시 현재 위치가 자동으로 전달됩니다.
-              </p>
+              <span className="location-shared">
+                <MapPin size={12} /> 위치정보 자동 전달
+              </span>
             )}
           </div>
         ) : (
           messages.map((m, i) => <Message key={i} message={m} />)
         )}
         {sending && (
-          <div className="flex justify-start">
-            <div className="px-3.5 py-2.5 rounded-2xl bg-white border border-gray-200 text-gray-400 text-sm">
-              상황실이 입력 중…
-            </div>
+          <div className="typing-row">
+            <span /><span /><span />
+            <small>상황실이 확인 중입니다</small>
           </div>
         )}
       </div>
 
       {messages.length === 0 && (
-        <div className="px-3 py-2 flex flex-wrap gap-2 border-t border-gray-100 bg-white">
+        <div className="quick-replies">
+          <p>빠른 신고</p>
+          <div>
           {QUICK_REPLIES.map((q) => (
             <button
               key={q}
               type="button"
               onClick={() => send(q)}
-              className="text-xs px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700"
             >
               {q}
             </button>
           ))}
+          </div>
         </div>
       )}
 
-      <div className="p-3 border-t border-gray-200 bg-white flex items-center gap-2">
+      <div className="chat-composer">
         <input
           type="text"
           value={input}
@@ -169,25 +163,16 @@ export default function EmergencyChat({ location, activeDisaster, onClearDisaste
             if (e.key === "Enter") send(input);
           }}
           placeholder="상황을 입력하세요…"
-          className="flex-1 border border-gray-300 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
         />
         <button
           type="button"
           onClick={() => send(input)}
           disabled={sending || !input.trim()}
-          className="flex-shrink-0 w-11 h-11 rounded-full bg-red-600 text-white flex items-center justify-center hover:bg-red-700 disabled:opacity-40"
+          className="send-button"
           aria-label="전송"
         >
           <Send size={18} />
         </button>
-        <a
-          href="tel:119"
-          className="flex-shrink-0 w-11 h-11 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-black"
-          aria-label="119 전화"
-          title="119 전화 걸기"
-        >
-          <Phone size={18} />
-        </a>
       </div>
     </div>
   );
