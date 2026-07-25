@@ -78,8 +78,15 @@ export default function DisasterList({
   return (
     <div className="alert-list">
       {alerts.length === 0 ? (
-        <div className="empty-alerts">
-          주변에 발효된 재난알림이 없습니다.
+        <div className={`empty-alerts ${status === "locating" ? "loading" : ""}`}>
+          {status === "locating" ? (
+            <>
+              <span className="loading-pulse" />
+              주변 안전정보를 확인하고 있습니다
+            </>
+          ) : (
+            "주변에 발효된 재난알림이 없습니다."
+          )}
         </div>
       ) : (
         <div className="alert-stack">

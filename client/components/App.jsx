@@ -78,7 +78,7 @@ export default function App() {
         minute: "2-digit",
         hour12: false,
       }).format(new Date(updatedAt))
-    : "--:--";
+    : "확인 중";
 
   return (
     <div className="app-frame">
@@ -151,7 +151,7 @@ export default function App() {
               <div>
                 <p className="hero-label">주변에 확인이 필요한 알림</p>
                 <div className="hero-number">
-                  {warningCount}<small>건</small>
+                  {loadingAlerts ? "–" : warningCount}<small>건</small>
                 </div>
               </div>
               <div className="hero-orbit">

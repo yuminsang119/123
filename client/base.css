@@ -551,6 +551,26 @@ body {
   font-size: 12px;
 }
 
+.empty-alerts.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.loading-pulse {
+  width: 7px;
+  height: 7px;
+  background: var(--danger);
+  border-radius: 50%;
+  animation: soft-pulse 1.2s infinite ease-in-out;
+}
+
+@keyframes soft-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
 .emergency-chat {
   height: 100%;
   display: flex;
